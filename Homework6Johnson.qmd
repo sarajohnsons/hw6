@@ -1,0 +1,106 @@
+---
+title: "Homework 6"
+format: pdf
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+```
+
+## Question 1
+
+```{r}
+#loading data
+rawtree <- read.csv("TS3_Raw_tree_data.csv")
+
+# i seperate the city column into city & state
+rawtree <- separate(rawtree, col = City, into = c("City", "State"), sep = ",\\s*")
+
+# state # of trees
+treest <- group_by(rawtree, State)
+treenumberst <- summarize(treest, Number = n())
+
+# barplot for # of trees per state
+ggplot(treenumberst, aes(x = State, y = Number)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Number of Trees by State", x = "State", y = "Number") 
+```
+
+So looking at the table, I see that these are the records in each state:
+
+AZ- 827, CA - 4062, CO - 867, FL - 895, HI - 918, ID - 923, IN - 877, MN - 760, NC - 828, NM - 833, NY - 831, SC - 872, WA - 994
+
+```{r}
+treenumberst
+```
+
+## Question 2
+
+```{r}
+# filter only nc and sc
+ncsctree <- rawtree[rawtree$State == "NC"| rawtree$State == "SC", ] 
+
+
+```
+
+Only Charleston and Charlotte are in the data! They collected data in NC and SC from these two cities.
+
+## Question 3
+
+```{r}
+genusncsc <- ncsctree %>%
+  group_by(ncsctree$Genus) %>%
+  summarize( avgcdia = mean(`AvgCdia..m.`, na.rm = TRUE)) 
+genusncsc <- arrange(genusncsc, desc(`avgcdia`))
+
+genusncsc
+```
+
+By looking at the results I see that the genus of tree Quercus has the largest crown diameter, avgcdia, with 13.623163.
+
+## Extra Credit
+
+Tree age
+
+```{r}
+
+agencsc <- ncsctree %>%
+  group_by(ncsctree$Genus) %>%
+  summarize( age = mean(`Age`, na.rm = TRUE))
+agencsc
+
+agencsc <- arrange(agencsc, desc(`age`))
+agencsc
+```
+
+No, we see that the top Genus is consistent, Quercus, but the other Genus's are not the same as their average crown diameter. This does not provide a good explanation to the last question. It does explain the biggest one as Quercus is the highest in both, but it does not totally explain crown diameter size as the rest of the list is different.
+
+```{r}
+highestcdia <- which.max(genusncsc$avgcdia)
+highestcdia
+
+lowestage <- which.min(agencsc$age)
+lowestage
+
+plot(agencsc$age, genusncsc$avgcdia,
+     xlab = "avg age",
+     ylab = "avg cdia",
+     main = "avg age & cdia - growing fast",
+     pch = 12, 
+     col = "green")
+```
+
+The Malus would be the fastest growing due to the amount it grew for its age.
+
+## Species
+
+```{r}
+
+```
+
+There is 13 different species present!!
+
+When I render the document I am having trouble getting this to show up & work but the code did work & run in here and I got 13!
